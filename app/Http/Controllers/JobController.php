@@ -4,106 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Enums\JobStatus;
 use App\Http\Requests\JobStoreRequest;
+use App\Http\Resources\CompanyResource;
 use App\Http\Resources\JobResource;
+use App\Http\Traits\CrudTrait;
+use App\Models\Company;
 use App\Models\Job;
 use Illuminate\Http\Request;
+
 
 class JobController extends Controller
 {
     /**
-     * Get a list of opening jobs to applicants.
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function view(Request $request)
+    * I used a trait to reuse a set of methods freely in several classes. 
+    * In addition, they can help improve maintainability and the cleanliness of your code.
+    */
+    use CrudTrait;
+
+    protected $model;
+    protected $status;
+    protected $enum;
+    
+    public function __construct()
     {
-        $jobs = Job::where('status', JobStatus::Open)->paginate($request->per_page);
-        return JobResource::collection($jobs);
+        // Instantiate the model class
+        $this->model = new Job();
+
+        // Optional params in other classes
+        $this->enum = JobStatus::class;
+        $this->status = JobStatus::Open;
     }
 
-    /**
-     * Show a opening job to applicants.
-     *
-     * @param integer $id
-     * @return void
-     */
-    public function show(int $id)
+    public function resources($data)
     {
-        $job = Job::where('status', JobStatus::Open)->find($id);
-        return new JobResource($job);
-    }
-
-    /**
-     * Get a list of opening jobs to applicants by admin.
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function viewByAdmin(Request $request)
-    {
-        $jobs = Job::paginate($request->per_page);
-        return JobResource::collection($jobs);
-    }
-
-    /**
-     * Show a opening job to applicants by admin.
-     *
-     * @param integer $id
-     * @return void
-     */
-    public function showAdmin(int $id)
-    {
-        $job = Job::find($id);
-        return new JobResource($job);
-    }
-
-    /**
-     * Register a job by admin.
-     *
-     * @param JobStoreRequest $request
-     * @return void
-     */
-    public function create(JobStoreRequest $request)
-    {
-        $job = new Job;
-        $job->company_id = $request->company_id;
-        $job->job_title_id = $request->job_title_id;
-        $job->description = $request->description;
-        $job->status = JobStatus::fromKey($request->status);
-        $job->save();
-        return new JobResource($job);
-    }
-
-    /**
-     * Update job by admin.
-     *
-     * @param JobStoreRequest $request
-     * @param integer $id
-     * @return void
-     */
-    public function update(JobStoreRequest $request, int $id)
-    {
-        $job = Job::find($id);
-        $job->company_id = $request->company_id;
-        $job->job_title_id = $request->job_title_id;
-        $job->description = $request->description;
-        $job->status = JobStatus::fromKey($request->status);
-        $job->save();
-        return new JobResource($job);
-    }
-
-    /**
-     * Delete job by admin.
-     *
-     * @param JobStoreRequest $request
-     * @param integer $id
-     * @return void
-     */
-    public function delete(int $id)
-    {
-        $job = Job::find($id);
-        $job->delete();
-        return response()->noContent();
+        return new JobResource($data);
     }
 }

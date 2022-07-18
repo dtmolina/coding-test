@@ -15,8 +15,8 @@ class JobStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id' => 'required',
-            'job_title_id' => 'required',
+            'company_id' => 'required|lt:99999999',
+            'job_title_id' => 'required|lt:99999999',
             'description' => 'required|max:20000',
             'status' => 'required|enum_key:' . JobStatus::class,
         ];
