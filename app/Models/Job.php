@@ -10,6 +10,18 @@ class Job extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'company_id',
+        'job_title_id',
+        'description',
+        'status',
+    ];
+
     protected $casts = [
         'status' => JobStatus::class,
     ];
